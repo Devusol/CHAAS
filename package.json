@@ -1,0 +1,20 @@
+{
+  "name": "refetch-interval",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.1",
+    "jsonwebtoken": "8.5.1",
+    "n-readlines": "1.0.1",
+    "prepend-file": "2.0.1",
+    "socket.io": "4.5.1"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "dev": "npx nodemon index.js"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.21"
+  }
+}
