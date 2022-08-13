@@ -1,10 +1,10 @@
 const socket = window.io(
-{
-  query: {
-    id: localStorage.id,
-    token: localStorage.token      
-  }
-});
+  {
+    query: {
+      id: localStorage.id,
+      token: localStorage.token
+    }
+  });
 
 const chatDiv = document.getElementById("chatBox");
 const sendBtn = document.getElementById("sendMsg");
@@ -17,7 +17,7 @@ socket.on("connect", () => {
 socket.on("msg", (message, sender) => {
   const para = document.createElement("p");
   para.innerText = `[${sender}] - ${message}`;
-chatDiv.appendChild(para);
+  chatDiv.appendChild(para);
 });
 
 sendBtn.addEventListener("click", () => {
