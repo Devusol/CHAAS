@@ -7,6 +7,7 @@ class User {
   chats = [];
   trusted = true;
   userPath = "";
+  unreadMsgs = false;
   constructor(authResult) {
     if (authResult != null) {
       const authUser = authResult.user;
@@ -23,8 +24,9 @@ class User {
   */
 
   write() {
+    console.log("user", this.unreadMsgs)
     return new Promise((res, rej) => {
-      console.log(this.userPath, this.toString())
+      // console.log(this.userPath, this.toString())
       fs.writeFile(this.userPath, this.toString(), "utf-8", (er) => {
         if (er) rej(er);
         res(this);
@@ -45,7 +47,7 @@ class User {
   read() {
     return new Promise((res, rej) => {
       // const parsed = JSON.parse(fs.readFileSync(this.userPath, "utf-8"));
-      console.log(this.userPath);
+      // console.log(this.userPath);
       fs.readFile(this.userPath, "utf-8", (er, data) => {
         if (er) {
           rej(er);
@@ -56,6 +58,7 @@ class User {
         this.id = parsed.id;
         this.chats = parsed.chats;
         this.trusted = parsed.trusted;
+        this.unreadMsgs = parsed.unread;
         res(this);
       });
 
@@ -98,7 +101,7 @@ class User {
   }
 
   toString() {
-    return JSON.stringify({ name: this.name, id: this.id, chats: this.chats, trusted: this.trusted })
+    return JSON.stringify({ name: this.name, id: this.id, chats: this.chats, trusted: this.trusted, unread: this.unreadMsgs})
   }
 }
 

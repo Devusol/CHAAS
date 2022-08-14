@@ -9,7 +9,7 @@ const LBL = require("n-readlines");
 const { User } = require("./user");
 const utils = require("./utils")
 
-
+const indexLines = 25;
 
 if (!fs.existsSync(paths.chat)) {
   fs.mkdirSync(paths.chat);
@@ -45,7 +45,7 @@ function getMsgs(id1, id2, indexAt) {
     line = rl.next();
     while (line) {
       lineNumber++;
-      if (lineNumber > indexAt + 10) {
+      if (lineNumber > indexAt + indexLines) {
         rl.fd = 0;
         rl.close();
         line = false;
@@ -115,8 +115,8 @@ io.on("connection", async (socket) => {
     // );
   } else {
     await user.read();
-    console.log(user);
-    console.log("reading user")
+    // console.log(user);
+    // console.log("reading user")
     if (!user.trusted) {
       user.trusted = true;
       user.name = authResult.user.name;
@@ -164,46 +164,6 @@ io.on("connection", async (socket) => {
       return;
     }
     const chatPath = paths.getChatPath(id, authId);
-    if (!fs.existsSync(chatPath)) {
-      // const userPath = paths.getUserPath(authId);
-      // fs.readFile(userPath, (e, dat) => {
-      //   if (e) {
-      //     console.log(e);
-      //   } else {
-      //     const parsed = JSON.parse(dat);
-      //     parsed.chats.forEach((uId, i) => {
-      //       if (id === uId) parsed.chats.splice(i, 1);
-      //     });
-      //     parsed.chats.unshift(id);
-      //     fs.writeFileSync(userPath, JSON.stringify(parsed));
-      //   }
-      // });
-
-      // user.chats.forEach((uId, i) => {
-      //   if (id === uId) user.chats.splice(i, 1);
-      // });
-      // user.chats.unshift(id);
-      // user.write();
-
-
-
-
-      // const otherUserPath = paths.getUserPath(id);
-      // fs.readFile(otherUserPath, (e, dat) => {
-      //   if (e) {
-      //     console.log(e);
-      //   } else {
-      //     const parsed = JSON.parse(dat);
-      //     parsed.chats.forEach((uId, i) => {
-      //       if (authId === uId) parsed.chats.splice(i, 1);
-      //     });
-      //     parsed.chats.unshift(authId);
-      //     fs.writeFileSync(otherUserPath, JSON.stringify(parsed));
-      //   }
-      // });
-
-
-    }
 
     user.prependChat(id);
 
@@ -218,23 +178,24 @@ io.on("connection", async (socket) => {
       // });
       // otherUser.trusted = false;
       // await otherUser.write();
-      otherUser = User.createUntrusted(name, id);
+      otherUser = await User.createUntrusted(name, id);
     }
+    otherUser.unreadMsgs = true;
     otherUser.prependChat(authId);
 
     const sortedIds = utils.getSortedIds(id, authId);
     const fMsg = sortedIds.indexOf(authId) + msg;
 
-    console.log("FORMATTED MESSAGE", fMsg)
+
 
     prependFile(chatPath, fMsg + "\n");
 
     (await io.fetchSockets()).forEach((sock) => {
       if (sock.data.id === id) {
-        sock.emit("msg", fMsg, authId);
+        sock.emit("msg", fMsg, authId, authId);
       }
     });
-    socket.emit("msg", fMsg, authId);
+    socket.emit("msg", fMsg, authId, otherUser.id);
   });
 
   socket.on("startChat", async (id, name) => {
@@ -242,17 +203,25 @@ io.on("connection", async (socket) => {
     if(otherUser == null) {
       otherUser = await User.createUntrusted(name, id);
     }
-    console.log(otherUser, typeof otherUser, otherUser instanceof User)
+    otherUser.unreadMsgs = true;
+    // console.log(otherUser, typeof otherUser, otherUser instanceof User)
     otherUser.prependChat(authId);
-    otherUser.write();
+    // otherUser.write();
     
     user.prependChat(id);
+    // user.write();
+  });
+
+  socket.on("unread", () => {
+    socket.emit("unread", user.unreadMsgs);
+    console.log(user.unreadMsgs);
+    user.unreadMsgs = false;
     user.write();
   });
 
   socket.on("disconnect", () => {
     console.log("Disconnected");
-    user.write();
+    // user.write();
   });
 });
 
