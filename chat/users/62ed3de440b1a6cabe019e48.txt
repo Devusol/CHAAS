@@ -1,1 +1,1 @@
-{"name":"Seaaan","id":"62ed3de440b1a6cabe019e48","chats":["62f919ef4e9c24583739bafd","62ed3ea440b1a6cabe019e4c"],"trusted":true,"unread":true}
+{"name":"Seaaan","id":"62ed3de440b1a6cabe019e48","chats":["62ed3ea440b1a6cabe019e4c","62f919ef4e9c24583739bafd"],"trusted":true,"unread":false}

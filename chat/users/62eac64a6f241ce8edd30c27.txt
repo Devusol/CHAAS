@@ -1,1 +1,1 @@
-{"name":"Admin Name","id":"62eac64a6f241ce8edd30c27","chats":[],"trusted":true}
+{"name":"Admin Name","id":"62eac64a6f241ce8edd30c27","chats":[],"trusted":true,"unread":false}
