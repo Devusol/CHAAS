@@ -1,3 +1,9 @@
+1hello]
+1hello
+0cool
+1yes
+0are you there?
+0hello
 1kkkl;jjijijlij;lkj;lkjl;kjlkjlkj;ljlkjlkj;lkj;lj;lkjlkjl;ijlijlj;ljlj;lkjlij;ljljlj;lijlkjlkj;lkhjkhvbjghfkdjgrsjgrdhkgkjlanDSLKFj'lISHfliashdflihsdLIFHCslihflishdOIFHsoiuhfilusehLFHas;eohfo;sueh;ODFHw;eouhdf;ouweh'FOIUHAW'ohef';oeuwhf'oiwehFO'IUHweo'ifh'oweihF'OIwehf'oihweOIFHawoeihf'oiwehF'OIHweoihf'oweuhFO'UwehfouhweOFHwe'oufh'oweHFO'wehfo'wehFO'Whfo'ihwef'owehf
 1Testing scroll function of text:
 1Hi
