@@ -1,1 +1,0 @@
-{"name":"test delete","id":"62fd89861b79a6a15c7ba3cf","chats":[],"trusted":true,"unread":false}

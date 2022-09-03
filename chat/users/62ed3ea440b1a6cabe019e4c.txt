@@ -1,1 +1,1 @@
-{"name":"Sean","id":"62ed3ea440b1a6cabe019e4c","chats":["62f919ef4e9c24583739bafd","62ed3de440b1a6cabe019e48"],"trusted":true,"unread":false}
+{"name":"Sean Carrier","id":"62ed3ea440b1a6cabe019e4c","chats":["62ed3ea440b1a6cabe019e4c","62ed3de440b1a6cabe019e48"],"trusted":true,"unread":true}

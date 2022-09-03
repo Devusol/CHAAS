@@ -1,21 +1,8 @@
-1hello]
-1hello
-0cool
-1yes
-0are you there?
-0hello
-1kkkl;jjijijlij;lkj;lkjl;kjlkjlkj;ljlkjlkj;lkj;lj;lkjlkjl;ijlijlj;ljlj;lkjlij;ljljlj;lijlkjlkj;lkhjkhvbjghfkdjgrsjgrdhkgkjlanDSLKFj'lISHfliashdflihsdLIFHCslihflishdOIFHsoiuhfilusehLFHas;eohfo;sueh;ODFHw;eouhdf;ouweh'FOIUHAW'ohef';oeuwhf'oiwehFO'IUHweo'ifh'oweihF'OIwehf'oihweOIFHawoeihf'oiwehF'OIHweoihf'oweuhFO'UwehfouhweOFHwe'oufh'oweHFO'wehfo'wehFO'Whfo'ihwef'owehf
-1Testing scroll function of text:
-1Hi
-1msg
-1message
-1a
-1test notif
-1test
-1test
-0test
-0hello
-0hi
-1test
-1hello
-0hello
+{"sender":"62ed3ea440b1a6cabe019e4c","msg":"b","date":"Sat Sep 03 2022"}
+{"sender":"62ed3ea440b1a6cabe019e4c","msg":"s","date":"Sat Sep 03 2022"}
+{"sender":"62ed3ea440b1a6cabe019e4c","msg":"k","date":"Sat Sep 03 2022"}
+{"sender":"62ed3ea440b1a6cabe019e4c","msg":"c","date":"Sat Sep 03 2022"}
+{"sender":"62ed3ea440b1a6cabe019e4c","msg":"a","date":"Sat Sep 03 2022"}
+{"sender":"62ed3ea440b1a6cabe019e4c","msg":"b","date":"Sat Sep 03 2022"}
+{"sender":"62ed3ea440b1a6cabe019e4c","msg":"hi","date":"Sat Sep 03 2022"}
+{"sender":"62ed3ea440b1a6cabe019e4c","msg":"hello","date":"Sat Sep 03 2022"}

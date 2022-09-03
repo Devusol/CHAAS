@@ -163,6 +163,8 @@ io.on("connection", async (socket) => {
       socket.emit("er", "Invalid ID " + id);
       return;
     }
+    if(id == authId) return;
+    
     const chatPath = paths.getChatPath(id, authId);
 
     user.prependChat(id);
@@ -184,21 +186,29 @@ io.on("connection", async (socket) => {
     otherUser.prependChat(authId);
 
     const sortedIds = utils.getSortedIds(id, authId);
-    const fMsg = sortedIds.indexOf(authId) + msg;
+    // const fMsg = sortedIds.indexOf(authId) + msg;
 
+    const msgJSON = {
+      sender: authId,
+      msg,
+      date: (new Date()).toDateString()
+    };
 
+    const fMsg = JSON.stringify(msgJSON);
 
     prependFile(chatPath, fMsg + "\n");
 
     (await io.fetchSockets()).forEach((sock) => {
       if (sock.data.id === id) {
         sock.emit("msg", fMsg, authId, authId);
+        
       }
     });
     socket.emit("msg", fMsg, authId, otherUser.id);
   });
 
   socket.on("startChat", async (id, name) => {
+    if(id == authId) return;
     var otherUser = await User.getById(id);
     if(otherUser == null) {
       otherUser = await User.createUntrusted(name, id);
