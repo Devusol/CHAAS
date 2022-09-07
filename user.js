@@ -100,6 +100,15 @@ class User {
     return user;
   }
 
+  async delete() {
+    return new Promise((res, rej) => {
+      fs.unlink(this.path, (er) => {
+        if(er) rej(er);
+        res();
+      });
+    });
+  }
+
   toString() {
     return JSON.stringify({ name: this.name, id: this.id, chats: this.chats, trusted: this.trusted, unread: this.unreadMsgs})
   }

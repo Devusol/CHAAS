@@ -32,34 +32,52 @@ const io = new SocketServer(http, {
   }
 });
 
-function getFile(id1, id2) {
-  return new LBL(paths.getChatPath(id1, id2));
+async function getFile(id1, id2) {
+  return new Promise((res, rej) => {
+    const chatPath = paths.getChatPath(id1, id2);
+    fs.exists(chatPath, (exists) => {
+      if(!exists) {
+        res(null);
+      } else {
+        res(new LBL(chatPath));
+      }
+    });
+  });
+  // return new LBL(paths.getChatPath(id1, id2));
 }
 
-function getMsgs(id1, id2, indexAt) {
-  const msgs = [];
-  try {
-    var lineNumber = 0;
-    var line;
-    const rl = getFile(id1, id2);
-    line = rl.next();
-    while (line) {
-      lineNumber++;
-      if (lineNumber > indexAt + indexLines) {
-        rl.fd = 0;
-        rl.close();
-        line = false;
-        break;
-      }
-      if (lineNumber >= indexAt) {
-        msgs.push(line.toString("utf-8"));
-      }
-      line = rl.next();
-    }
-  } catch(e) {
-    console.log(e)
-  }
-  return msgs;
+async function getMsgs(id1, id2, indexAt) {
+  // const msgs = [];
+  // try {
+    // var lineNumber = 0;
+    // var line;
+    // const rl = await getFile(id1, id2);
+    // if(rl == null) return null;
+    // line = rl.next();
+    // // if(!rl.fd) {
+    // //   rl.fd = fs.openSync(paths.getChatPath(id1, id2), "r");
+    // // }
+    // while (line) {
+    //   // console.log(line.toString("utf-8"))
+    //   lineNumber++;
+    //   if (lineNumber > indexAt + indexLines) {
+    //     rl.fd = 0;
+    //     rl.close();
+    //     line = false;
+    //     break;
+    //   }
+    //   if (lineNumber >= indexAt) {
+    //     msgs.push(line.toString("utf-8"));
+    //   }
+    //   line = rl.next();
+      
+    // }
+  return new Promise((res, rej) => {
+    fs.readFile(paths.getChatPath(id1, id2), "utf-8", (er, dat) => {
+      if(er) rej(er);
+      res(dat.split("\n").filter(el => el.length));
+    });    
+  });
 }
 
 function handleAuth(socket) {
@@ -153,9 +171,10 @@ io.on("connection", async (socket) => {
   });
 
   // Request message history with user, at index
-  socket.on("getMessages", (id, index) => {
-
-    socket.emit("msgs", index, id, getMsgs(authId, id, index));
+  socket.on("getMessages", async (id, index, noClear) => {
+    const msgs = await getMsgs(authId, id, index);
+    // console.log(msgs);
+    socket.emit("msgs", index, id, msgs, noClear);
   });
 
   socket.on("sendMsg", async (msg, id, name) => {
@@ -219,6 +238,7 @@ io.on("connection", async (socket) => {
     // otherUser.write();
     
     user.prependChat(id);
+    socket.emit("chatCreated");
     // user.write();
   });
 
