@@ -202,9 +202,8 @@ io.on("connection", async (socket) => {
       otherUser = await User.createUntrusted(name, id);
     }
     otherUser.unreadMsgs = true;
-    otherUser.prependChat(authId);
 
-    const sortedIds = utils.getSortedIds(id, authId);
+    // const sortedIds = utils.getSortedIds(id, authId);
     // const fMsg = sortedIds.indexOf(authId) + msg;
 
     const msgJSON = {
@@ -220,9 +219,11 @@ io.on("connection", async (socket) => {
     (await io.fetchSockets()).forEach((sock) => {
       if (sock.data.id === id) {
         sock.emit("msg", fMsg, authId, authId);
-        
+        otherUser.unreadMsgs = false;
       }
     });
+    
+    otherUser.prependChat(authId);
     socket.emit("msg", fMsg, authId, otherUser.id);
   });
 

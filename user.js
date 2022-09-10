@@ -24,7 +24,7 @@ class User {
   */
 
   write() {
-    console.log("user", this.unreadMsgs)
+    // console.log("user", this.unreadMsgs)
     return new Promise((res, rej) => {
       // console.log(this.userPath, this.toString())
       fs.writeFile(this.userPath, this.toString(), "utf-8", (er) => {
