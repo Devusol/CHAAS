@@ -5,9 +5,10 @@ const fs = require("fs");
 const paths = require("./paths");
 const jwt = require("jsonwebtoken");
 const prependFile = require("prepend-file");
-const LBL = require("n-readlines");
+// const LBL = require("n-readlines");
 const { User } = require("./user");
-const utils = require("./utils")
+const utils = require("./utils");
+const Message = require("./message");
 
 const indexLines = 25;
 
@@ -32,19 +33,19 @@ const io = new SocketServer(http, {
   }
 });
 
-async function getFile(id1, id2) {
-  return new Promise((res, rej) => {
-    const chatPath = paths.getChatPath(id1, id2);
-    fs.exists(chatPath, (exists) => {
-      if(!exists) {
-        res(null);
-      } else {
-        res(new LBL(chatPath));
-      }
-    });
-  });
-  // return new LBL(paths.getChatPath(id1, id2));
-}
+// async function getFile(id1, id2) {
+//   return new Promise((res, rej) => {
+//     const chatPath = paths.getChatPath(id1, id2);
+//     fs.exists(chatPath, (exists) => {
+//       if(!exists) {
+//         res(null);
+//       } else {
+//         res(new LBL(chatPath));
+//       }
+//     });
+//   });
+//   // return new LBL(paths.getChatPath(id1, id2));
+// }
 
 async function getMsgs(id1, id2, indexAt) {
   // const msgs = [];
@@ -72,9 +73,16 @@ async function getMsgs(id1, id2, indexAt) {
     //   line = rl.next();
       
     // }
+  const chatPath = paths.getChatPath(id1, id2);
+  if(!fs.existsSync(chatPath)){
+      fs.writeFileSync(chatPath, "");
+    }
   return new Promise((res, rej) => {
-    fs.readFile(paths.getChatPath(id1, id2), "utf-8", (er, dat) => {
-      if(er) rej(er);
+    fs.readFile(chatPath, "utf-8", (er, dat) => {
+      if(er || dat == null || dat == undefined) {
+        rej([er, dat]);
+        return;
+      }
       res(dat.split("\n").filter(el => el.length));
     });    
   });
@@ -172,8 +180,13 @@ io.on("connection", async (socket) => {
 
   // Request message history with user, at index
   socket.on("getMessages", async (id, index, noClear) => {
-    const msgs = await getMsgs(authId, id, index);
-    // console.log(msgs);
+    const msgs = await getMsgs(authId, id, index)
+    .catch(e => {
+      socket.emit("chaasError", {msg: "failed to get messages", e});
+    });
+    if(msgs == null) {
+      return;
+    }
     socket.emit("msgs", index, id, msgs, noClear);
   });
 
@@ -206,11 +219,13 @@ io.on("connection", async (socket) => {
     // const sortedIds = utils.getSortedIds(id, authId);
     // const fMsg = sortedIds.indexOf(authId) + msg;
 
-    const msgJSON = {
-      sender: authId,
-      msg,
-      date: (new Date()).toDateString()
-    };
+    // const msgJSON = {
+    //   sender: authId,
+    //   msg,
+    //   date: (new Date()).toDateString()
+    // };
+
+    const msgJSON = new Message(msg, authId);
 
     const fMsg = JSON.stringify(msgJSON);
 
@@ -235,10 +250,10 @@ io.on("connection", async (socket) => {
     }
     otherUser.unreadMsgs = true;
     // console.log(otherUser, typeof otherUser, otherUser instanceof User)
-    otherUser.prependChat(authId);
+    await otherUser.prependChat(authId);
     // otherUser.write();
     
-    user.prependChat(id);
+    await user.prependChat(id);
     socket.emit("chatCreated");
     // user.write();
   });
