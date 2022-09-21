@@ -195,7 +195,7 @@ io.on("connection", async (socket) => {
       socket.emit("er", "Invalid ID " + id);
       return;
     }
-    if(id == authId) return;
+    if(id == authId || !msg?.length) return;
     
     const chatPath = paths.getChatPath(id, authId);
 
@@ -263,6 +263,23 @@ io.on("connection", async (socket) => {
     console.log(user.unreadMsgs);
     user.unreadMsgs = false;
     user.write();
+  });
+
+  socket.on("deleteConvo", async (id) => {
+    try {
+      for(let i = 0; i < user.chats.length; i++) {
+        if(user.chats[i] == id) {
+          user.chats.splice(i, 1);
+          await user.write();
+          socket.emit("deleteResult", true);
+          return;
+        }
+      }
+      socket.emit("deleteResult", false, id);
+    } catch(e) {
+      console.log(e);
+      socket.emit("deleteResult", false, e.message);
+    }
   });
 
   socket.on("disconnect", () => {
