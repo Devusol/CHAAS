@@ -1,1 +1,1 @@
-{"name":"Jim Simmons","id":"6313c40e2557d5f3125864cc","chats":["632f6aba759cd1701874996e"],"trusted":true,"unread":false}
+{"name":"Broker Account","id":"6313c40e2557d5f3125864cc","chats":[],"trusted":true,"unread":true}

@@ -1,1 +1,1 @@
-{"name":"Charles Raymond","id":"6313b11825b5ffaa6a8527c8","chats":["632f6aba759cd1701874996e","6334b369f4f53bd1cb8c62bc","6313c40e2557d5f3125864cc"],"trusted":true,"unread":false}
+{"name":"Carrier Account","id":"6313b11825b5ffaa6a8527c8","chats":[],"trusted":true,"unread":false}
