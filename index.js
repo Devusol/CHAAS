@@ -140,7 +140,9 @@ io.on("connection", async (socket) => {
     //   JSON.stringify({ name: authResult.user.name, id: authId, chats: [], trusted: true })
     // );
   } else {
+    
     await user.read();
+    console.log("old user", user)
     // console.log(user);
     // console.log("reading user")
     if (!user.trusted) {
@@ -260,7 +262,7 @@ io.on("connection", async (socket) => {
 
   socket.on("unread", () => {
     socket.emit("unread", user.unreadMsgs);
-    console.log(user.unreadMsgs);
+    console.log("UNREAD", user.unreadMsgs);
     user.unreadMsgs = false;
     user.write();
   });
