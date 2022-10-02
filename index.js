@@ -1,3 +1,5 @@
+require('dotenv').config();
+const cors = require('cors')
 const express = require("express");
 const SocketServer = require("socket.io").Server;
 const { Server } = require("http");
@@ -9,7 +11,7 @@ const prependFile = require("prepend-file");
 const { User } = require("./user");
 const utils = require("./utils");
 const Message = require("./message");
-
+const port = process.env.PORT || 5000;
 const indexLines = 25;
 
 if (!fs.existsSync(paths.chat)) {
@@ -290,12 +292,13 @@ io.on("connection", async (socket) => {
   });
 });
 
+app.use(cors())
 app.use(express.static(__dirname + "/public"));
 
 app.get("/", (req, res) => {
   res.redirect("/index.html");
 });
 
-http.listen(3000, () => {
-  console.log("server on port 3k");
+http.listen(port, () => {
+  console.log(`server on port ${port}`);
 });
