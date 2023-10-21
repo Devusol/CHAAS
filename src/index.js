@@ -8,6 +8,7 @@ import { Server as SocketServer } from "socket.io";
 
 import { User } from "./models/user.js";
 import { Message } from "./models/message.js";
+import { Conversation } from "./models/conversation.js";
 
 const BASE_DIR = process.cwd();
 
@@ -66,18 +67,18 @@ io.on("connection", async (socket) => {
     return;
   }
 
-  const authEmail = authResult.email;
+  const currentEmail = authResult.email.toLowerCase();
 
-  if (!authEmail) {// old jwt, cannot create user
+  if (!currentEmail) {// old jwt, cannot create user
     socket.disconnect();
     return;
   }
 
-  let user = await User.findOne({ email: authEmail });
+  let user = await User.findOne({ email: currentEmail });
 
   if (user == null) {
     user = new User({
-      email: authEmail,
+      email: currentEmail,
     });
 
     console.log("creating new user");
@@ -93,72 +94,49 @@ io.on("connection", async (socket) => {
     socket.emit("messages", messages);
   });
 
-  socket.on("sendMsg", async (msg, id, name) => {
-    if (typeof id != "string") {
-      socket.emit("er", "Invalid ID " + id);
+  socket.on("startConversation", async (otherEmail) => {
+    otherEmail = otherEmail.toLowerCase();
+    if (typeof otherEmail != "string" || otherEmail == currentEmail) {
+      socket.emit("er", "Invalid email " + otherEmail);
       return;
     }
-    if (id == authEmail || !msg?.length) return;
 
-    const chatPath = paths.getChatPath(id, authEmail);
+    let conversation = await Conversation.findOne({ userEmails: [currentEmail, otherEmail] });
 
-    user.prependChat(id);
-
-
-    var otherUser = await User.getById(id);
-    if (otherUser == null) {
-      // otherUser = new User({
-      //   user: {
-      //     name,
-      //     id,
-      //   }
-      // });
-      // otherUser.trusted = false;
-      // await otherUser.write();
-      otherUser = await User.createUntrusted(name, id);
+    if (conversation != null) {
+      socket.emit("conversation", conversation._id, false);
+      return;
     }
-    otherUser.unreadMsgs = true;
 
-    // const sortedIds = utils.getSortedIds(id, authId);
-    // const fMsg = sortedIds.indexOf(authId) + msg;
-
-    // const msgJSON = {
-    //   sender: authId,
-    //   msg,
-    //   date: (new Date()).toDateString()
-    // };
-
-    const msgJSON = new Message(msg, authEmail);
-
-    const fMsg = JSON.stringify(msgJSON);
-
-    prependFile(chatPath, fMsg + "\n");
-
-    (await io.fetchSockets()).forEach((sock) => {
-      if (sock.data.id === id) {
-        sock.emit("msg", fMsg, authEmail, authEmail);
-        otherUser.unreadMsgs = false;
-      }
+    conversation = new Conversation({
+      userEmails: [currentEmail, otherEmail],
+      notSeenByEmail: otherEmail,
     });
 
-    otherUser.prependChat(authEmail);
-    socket.emit("msg", fMsg, authEmail, otherUser.id);
+    await conversation.save();
+
+    socket.emit("conversation", conversation._id, true);
   });
 
-  socket.on("startChat", async (id, name) => {
-    if (id == authEmail) return;
-    var otherUser = await User.getById(id);
-    if (otherUser == null) {
-      otherUser = await User.createUntrusted(name, id);
+  socket.on("sendMessage", async (msg, conversationId) => {
+    const conversation = await Conversation.findById(conversationId);
+    if (conversation == null) {
+      socket.emit("er", "Conversation not found");
+      return;
     }
-    otherUser.unreadMsgs = true;
-    // console.log(otherUser, typeof otherUser, otherUser instanceof User)
-    await otherUser.prependChat(authEmail);
-    // otherUser.write();
 
-    await user.prependChat(id);
-    socket.emit("chatCreated");
-    // user.write();
+    const otherEmail = conversation.userEmails.find((e) => e != currentEmail);
+
+    const message = new Message({
+      text: msg,
+      conversation: conversationId,
+    });
+
+    conversation.notSeenByEmail = otherEmail;
+
+    await message.save();
+
+    socket.emit("messageSent", message._id);
   });
 
   socket.on("unread", () => {

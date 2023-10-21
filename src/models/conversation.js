@@ -1,7 +1,8 @@
 import { Schema, model } from "mongoose";
 
 const conversationSchema = new Schema({
-  users: [String],
+  userEmails: [String],
+  notSeenByEmail: String,
 });
 
 export const Conversation = model("Conversation", conversationSchema);
