@@ -1,8 +1,7 @@
 const socket = window.io(
   {
     query: {
-      id: localStorage.id,
-      token: localStorage.token
+      token: localStorage.token,
     }
   });
 
@@ -18,6 +17,14 @@ socket.on("msg", (message, sender) => {
   const para = document.createElement("p");
   para.innerText = `[${sender}] - ${message}`;
   chatDiv.appendChild(para);
+});
+
+socket.on("conversations", (chats) => {
+  console.log("conversations", chats);
+});
+
+socket.on("messages", (messages) => {
+  console.log("messages", messages);
 });
 
 sendBtn.addEventListener("click", () => {
