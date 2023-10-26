@@ -74,6 +74,7 @@ io.on("connection", async (socket) => {
     return;
   }
 
+
   let user = await User.findOne({ email: currentEmail });
 
   if (user == null) {
@@ -85,7 +86,11 @@ io.on("connection", async (socket) => {
     await user.save();
   }
 
-  socket.emit("conversations", user.conversations);
+  const conversations = await Conversation.find({ userEmails: [currentEmail] })
+    .where("hiddenByEmail").ne(currentEmail)
+    .exec();
+  socket.emit("conversations", conversations);
+
 
   // Request message history with user, at index
   socket.on("messages", async (conversationId, index) => {
@@ -134,33 +139,33 @@ io.on("connection", async (socket) => {
 
     conversation.notSeenByEmail = otherEmail;
 
+    const otherUser = await User.findOne({ email: otherEmail });
+    otherUser.unreadMessageAmount++;
+
+    await otherUser.save();
     await message.save();
+    await conversation.save();
 
     socket.emit("messageSent", message._id);
   });
 
-  socket.on("unread", () => {
-    socket.emit("unread", user.unreadMsgs);
-    console.log("UNREAD", user.unreadMsgs);
-    user.unreadMsgs = false;
-    user.write();
+  socket.on("unread", async () => {
+    const user = await User.findOne({ email: currentEmail });
+
+    socket.emit("unread", user.unreadMessageAmount);
   });
 
-  socket.on("deleteConvo", async (id) => {
-    try {
-      for (let i = 0; i < user.chats.length; i++) {
-        if (user.chats[i] == id) {
-          user.chats.splice(i, 1);
-          await user.write();
-          socket.emit("deleteResult", true);
-          return;
-        }
-      }
-      socket.emit("deleteResult", false, id);
-    } catch (e) {
-      console.log(e);
-      socket.emit("deleteResult", false, e.message);
+  socket.on("deleteConversation", async (id) => {
+
+    const conversation = await Conversation.findById(id);
+
+    if (conversation == null) {
+      socket.emit("deleteResult", false, "Conversation not found");
+      return;
     }
+
+    conversation.hiddenByEmail.set(currentEmail, true);
+    conversation.save();
   });
 
   socket.on("disconnect", () => {
